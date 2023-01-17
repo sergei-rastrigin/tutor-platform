@@ -22,3 +22,12 @@ async def check_password(app, email, password):
     db_password = result[0]
 
     return bcrypt.checkpw(password.encode(), bytes.fromhex(db_password[2:]))
+
+async def find_user_id(app, email):
+    async with app['db'].acquire() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute("SELECT * FROM tutors WHERE email = %s", (email,))
+            result = await cur.fetchone()
+    if result is None:
+        return None
+    return result[0]
